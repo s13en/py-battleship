@@ -9,11 +9,21 @@ class Deck:
 
 
 class Ship:
-    def __init__(self, start: tuple[int, int], end: tuple[int, int], is_drowned=False) -> None:
+    def __init__(
+            self,
+            start: tuple[int, int],
+            end: tuple[int, int],
+            is_drowned: bool = False
+    ) -> None:
         self.decks = self._create_decks(start, end)
         self.is_drowned = is_drowned
+        self._validate_ship(start, end)
 
-    def _create_decks(self, start: tuple[int, int], end: tuple[int, int]) -> list[Deck]:
+    def _create_decks(
+            self,
+            start: tuple[int, int],
+            end: tuple[int, int]
+    ) -> list[Deck]:
         decks = []
         if start[0] == end[0]:
             for column in range(start[1], end[1] + 1):
@@ -24,9 +34,15 @@ class Ship:
 
         return decks
 
-    def _validate_ship(self, start: tuple[int, int], end: tuple[int, int]) -> None:
+    def _validate_ship(
+            self,
+            start: tuple[int, int],
+            end: tuple[int, int]
+    ) -> None:
         if not (start[0] == end[0] or start[1] == end[1]):
-            raise ValueError("Ship must be placed either horizontally or vertically.")
+            raise (ValueError
+                   ("Ship must be placed either horizontally or vertically.")
+                   )
         if not self.decks:
             raise ValueError("Invalid ship size.")
 
@@ -37,7 +53,7 @@ class Ship:
 
         return None
 
-    def fire(self, row, column):
+    def fire(self, row: int, column: int) -> str:
         deck = self.get_deck(row, column)
         if deck and deck.is_alive:
             deck.hit()
@@ -47,10 +63,17 @@ class Ship:
 
 
 class Battleship:
-    def __init__(self, ships: list[tuple[tuple[int, int], tuple[int, int]]]):
+    def __init__(
+            self,
+            ships: list[tuple[tuple[int, int], tuple[int, int]]]) -> None:
         self.field = {}
         self.ships = []
+        self._initialize_field(ships)
+        self._validate_field()
 
+    def _initialize_field(
+            self,
+            ships: list[tuple[tuple[int, int], tuple[int, int]]]) -> None:
         for start, end in ships:
             ship = Ship(start, end)
             self.ships.append(ship)
@@ -77,11 +100,13 @@ class Battleship:
                 for dx in (-1, 0, 1):
                     for dy in (-1, 0, 1):
                         neighbor = (deck.row + dx, deck.column + dy)
-                        if neighbor in self.field and self.field[neighbor] != ship:
+                        if (neighbor in self.field
+                                and self.field[neighbor] != ship):
                             raise ValueError("Ships must not be adjacent.")
 
         if ship_counts != {1: 4, 2: 3, 3: 2, 4: 1}:
-            raise ValueError("Field must contain 1 four-deck, 2 three-deck, 3 two-deck, and 4 single-deck ships.")
+            raise ValueError("Field must contain 1 four-deck, 2 three-deck, "
+                             "3 two-deck, and 4 single-deck ships.")
 
     def print_field(self) -> None:
         for row in range(10):
